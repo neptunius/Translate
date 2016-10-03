@@ -20,12 +20,21 @@ def translate(text):
     http = httplib2.Http()
     response, body = http.request(url, "GET")
 
-    # Parse the JSON document into native Python structures
-    content = json.loads(body)
+    content = {}
+    try:
+        # Parse the JSON document into native Python structures
+        content = json.loads(body)
+    except ValueError as e:
+        print "HTTP response from Google was not valid JSON document"
 
-    # Retrieve the translated text from the nested structure
-    translatedText = content['data']['translations'][0]['translatedText']
-    return translatedText
+    if "data" in content:
+        # Retrieve the translated text from the nested structure
+        translations = content["data"]["translations"]
+        if len(translations) > 0:
+            translatedText = translations[0]["translatedText"]
+            return translatedText
+
+    return None
 
 
 if __name__ == "__main__":
