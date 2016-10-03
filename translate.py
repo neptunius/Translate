@@ -3,29 +3,31 @@ import urllib
 import json
 from pprint import pprint
 
+
+# Google Cloud API constants
 GOOGLE_API_KEY = "--- secret ---"
 GOOGLE_TRANSLATE_URL = "https://www.googleapis.com/language/translate/v2"
-# params: ?key=$GOOGLE_API_KEY&source=en&target=es&q=Hello%20world"
 
-url = GOOGLE_TRANSLATE_URL + "?key=" + GOOGLE_API_KEY
-url += "&source=en"
-url += "&target=es"
-url += "&q=" + urllib.quote_plus("Hello world")
 
-http = httplib2.Http()
-# resp, content = http.request(url, method, headers=headers, body=data)
-response, body = http.request(url)
+def translate(text):
+    # Assemble the full URL with the query parameters
+    url = GOOGLE_TRANSLATE_URL + "?key=" + GOOGLE_API_KEY
+    url += "&source=en"
+    url += "&target=es"
+    url += "&q=" + urllib.quote_plus(text)
 
-# print type(response)
-# pprint(response)
+    # Create an HTTP client and make a GET request to the URL
+    http = httplib2.Http()
+    response, body = http.request(url, "GET")
 
-# print type(body)
-# print body
+    # Parse the JSON document into native Python structures
+    content = json.loads(body)
 
-content = json.loads(body)
-# print type(content)
-# print content
+    # Retrieve the translated text from the nested structure
+    translatedText = content['data']['translations'][0]['translatedText']
+    return translatedText
 
-translatedText = content['data']['translations'][0]['translatedText']
-# print type(translatedText)
-print translatedText
+
+if __name__ == "__main__":
+    # Test the translate function
+    print translate("Hello world")
